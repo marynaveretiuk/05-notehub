@@ -7,7 +7,7 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const modalRoot = document.getElementById('modal-root') as HTMLElement;
+const modalRoot = document.getElementById('modal-root');
 
 export default function Modal({ children, onClose }: ModalProps) {
   useEffect(() => {
@@ -19,8 +19,12 @@ export default function Modal({ children, onClose }: ModalProps) {
 
     window.addEventListener('keydown', handleKeyDown);
 
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
     };
   }, [onClose]);
 
@@ -31,6 +35,8 @@ export default function Modal({ children, onClose }: ModalProps) {
       onClose();
     }
   };
+
+  if (!modalRoot) return null;
 
   return createPortal(
     <div

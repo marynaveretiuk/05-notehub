@@ -30,7 +30,7 @@ export interface CreateNotePayload {
 export const fetchNotes = async ({
   page,
   search,
-  perPage = 9,
+  perPage = 12,
 }: FetchNotesParams): Promise<FetchNotesResponse> => {
   const { data } = await notehubApi.get<FetchNotesResponse>('/notes', {
     params: {
@@ -50,7 +50,7 @@ export const createNote = async (
   return data;
 };
 
-export const deleteNote = async (id: number): Promise<Note> => {
+export const deleteNote = async (id: string): Promise<Note> => {
   const { data } = await notehubApi.delete<Note>(`/notes/${id}`);
   return data;
 };

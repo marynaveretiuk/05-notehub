@@ -1,30 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import css from './App.module.css';
 import SearchBox from '../SearchBox/SearchBox';
 import Pagination from '../Pagination/Pagination';
 import NoteList from '../NoteList/NoteList';
 import Modal from '../Modal/Modal';
-import NoteForm, { type NoteFormValues } from '../NoteForm/NoteForm';
-import {
-  fetchNotes,
-  createNote,
-  deleteNote,
-} from '../../services/noteService';
+import NoteForm from '../NoteForm/NoteForm';
+import { fetchNotes } from '../../services/noteService';
 
 export default function App() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const queryClient = useQueryClient();
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
@@ -40,29 +29,6 @@ export default function App() {
     queryFn: () => fetchNotes({ page, search: searchQuery }),
     placeholderData: keepPreviousData,
   });
-
-  const createMutation = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      setIsModalOpen(false);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-    },
-  });
-
-  const handleCreateNote = (values: NoteFormValues) => {
-    createMutation.mutate(values);
-  };
-
-  const handleDeleteNote = (id: number) => {
-    deleteMutation.mutate(id);
-  };
 
   const notes = data?.notes ?? [];
   const totalPages = data?.totalPages ?? 0;
@@ -89,12 +55,10 @@ export default function App() {
       {isError && <p>Something went wrong...</p>}
 
       {!isLoading && !isError && notes.length > 0 && (
-        <NoteList notes={notes} onDelete={handleDeleteNote} />
+        <NoteList notes={notes} />
       )}
 
-      {!isLoading && !isError && notes.length === 0 && (
-        <p>No notes found.</p>
-      )}
+      {!isLoading && !isError && notes.length === 0 && <p>No notes found.</p>}
 
       {totalPages > 1 && (
         <Pagination
@@ -106,10 +70,7 @@ export default function App() {
 
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
-          <NoteForm
-            onSubmit={handleCreateNote}
-            onCancel={() => setIsModalOpen(false)}
-          />
+          <NoteForm onCancel={() => setIsModalOpen(false)} />
         </Modal>
       )}
     </div>
