@@ -30,7 +30,7 @@ export interface CreateNotePayload {
 export const fetchNotes = async ({
   page,
   search,
-  perPage = 12,
+  perPage = 9,
 }: FetchNotesParams): Promise<FetchNotesResponse> => {
   const { data } = await notehubApi.get<FetchNotesResponse>('/notes', {
     params: {

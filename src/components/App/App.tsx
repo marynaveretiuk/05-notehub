@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import {
+  keepPreviousData,
   useMutation,
   useQuery,
   useQueryClient,
@@ -37,6 +38,7 @@ export default function App() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['notes', page, searchQuery],
     queryFn: () => fetchNotes({ page, search: searchQuery }),
+    placeholderData: keepPreviousData,
   });
 
   const createMutation = useMutation({
@@ -65,6 +67,12 @@ export default function App() {
   const notes = data?.notes ?? [];
   const totalPages = data?.totalPages ?? 0;
 
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -80,8 +88,12 @@ export default function App() {
       {isLoading && <p>Loading...</p>}
       {isError && <p>Something went wrong...</p>}
 
-      {notes.length > 0 && (
+      {!isLoading && !isError && notes.length > 0 && (
         <NoteList notes={notes} onDelete={handleDeleteNote} />
+      )}
+
+      {!isLoading && !isError && notes.length === 0 && (
+        <p>No notes found.</p>
       )}
 
       {totalPages > 1 && (
