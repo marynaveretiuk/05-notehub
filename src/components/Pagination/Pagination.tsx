@@ -1,4 +1,4 @@
-import ReactPaginateImport from 'react-paginate';
+import ReactPaginate from 'react-paginate';
 import css from './Pagination.module.css';
 
 interface PaginationProps {
@@ -6,11 +6,6 @@ interface PaginationProps {
   currentPage: number;
   onPageChange: (selectedPage: number) => void;
 }
-
-const ReactPaginate =
-  typeof ReactPaginateImport === 'function'
-    ? ReactPaginateImport
-    : ReactPaginateImport.default;
 
 export default function Pagination({
   pageCount,

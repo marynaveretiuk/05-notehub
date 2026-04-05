@@ -20,7 +20,6 @@ import {
 
 export default function App() {
   const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -32,7 +31,6 @@ export default function App() {
   }, 500);
 
   const handleSearchChange = (value: string) => {
-    setSearchValue(value);
     debouncedSearch(value);
   };
 
@@ -40,7 +38,7 @@ export default function App() {
     queryKey: ['notes', page, searchQuery],
     queryFn: () => fetchNotes({ page, search: searchQuery }),
   });
-    
+
   const createMutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
@@ -71,13 +69,6 @@ export default function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox onChange={handleSearchChange} />
-        {totalPages > 1 && (
-          <Pagination
-            pageCount={totalPages}
-            currentPage={page}
-            onPageChange={setPage}
-          />
-        )}
         <button
           className={css.button}
           onClick={() => setIsModalOpen(true)}
@@ -88,8 +79,17 @@ export default function App() {
 
       {isLoading && <p>Loading...</p>}
       {isError && <p>Something went wrong...</p>}
+
       {notes.length > 0 && (
         <NoteList notes={notes} onDelete={handleDeleteNote} />
+      )}
+
+      {totalPages > 1 && (
+        <Pagination
+          pageCount={totalPages}
+          currentPage={page}
+          onPageChange={setPage}
+        />
       )}
 
       {isModalOpen && (
@@ -103,4 +103,3 @@ export default function App() {
     </div>
   );
 }
-
